@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "mush.workspaces",
+  "name": "Ubuntu Workspaces",
+  "version": "1.1.0",
+  "author": "mush",
+  "description": "Ubuntu / GNOME dynamic pill-and-dots workspace indicator",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Workspaces.qml"
+  },
+  "barWidget": {
+    "displayName": "Ubuntu Workspaces",
+    "description": "Ubuntu / GNOME dynamic pill-and-dots workspace indicator",
+    "category": "Compositor",
+    "allowMultiple": false
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.workspaces"
+  }
+}
