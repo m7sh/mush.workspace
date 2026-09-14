@@ -4,7 +4,20 @@
   "name": "Ubuntu Workspaces",
   "version": "1.1.0",
   "author": "mush",
-  "description": "Ubuntu / GNOME dynamic pill-and-dots workspace indicator",
+  "license": "MIT",
+  "description": "Ubuntu / GNOME dynamic pill-and-dots workspace indicator for Omarchy.",
+  "homepage": "https://github.com/m7sh/mush.workspace",
+  "repository": "https://github.com/m7sh/mush.workspace",
+  "keywords": [
+    "workspaces",
+    "hyprland",
+    "gnome",
+    "ubuntu",
+    "quickshell",
+    "omarchy",
+    "bar",
+    "indicator"
+  ],
   "kinds": [
     "bar-widget"
   ],
@@ -15,7 +28,8 @@
     "displayName": "Ubuntu Workspaces",
     "description": "Ubuntu / GNOME dynamic pill-and-dots workspace indicator",
     "category": "Compositor",
-    "allowMultiple": false
+    "allowMultiple": false,
+    "defaultSection": "left"
   },
   "omarchy": {
     "clonedFrom": "omarchy.workspaces"
