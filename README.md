@@ -77,6 +77,7 @@ You can customize the widget in `~/.config/omarchy/shell.json` under the `mush.w
   "pillWidth": 24,
   "spacing": 6,
   "showNumbers": false,
+  "hideEmptyWorkspaces": false,
   "style": "theme"
 }
 ```
@@ -92,6 +93,7 @@ You can customize the widget in `~/.config/omarchy/shell.json` under the `mush.w
 | `pillWidth` | Number | `24` | Width / length of the active workspace pill (in pixels). |
 | `spacing` | Number | `6` | Pixel spacing between adjacent workspace dots and the pill. |
 | `showNumbers` | Boolean | `false` | When `true`, displays workspace index numbers inside the dots and active pill. |
+| `hideEmptyWorkspaces` | Boolean | `false` | When `true`, hides workspace dots that contain no windows. The currently focused workspace always stays visible. |
 | `style` | String | `"theme"` | Color style preset: `"theme"` (uses active theme accent), `"foreground"` / `"gnome"` / `"white"` (uses foreground text color). |
 | `activeColor` | String | `""` | Custom color override for the active pill (e.g. `"#a855f7"`, `"accent"`, `"foreground"`, or `"white"`). |
 

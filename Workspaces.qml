@@ -13,6 +13,7 @@ BarWidget {
   readonly property int pillLength: root.setting("pillWidth", 24)
   readonly property int itemSpacing: root.setting("spacing", 6)
   readonly property bool showNumbers: root.setting("showNumbers", false)
+  readonly property bool hideEmpty: root.setting("hideEmptyWorkspaces", false)
 
   // Color tokens — seamlessly matches the active theme
   readonly property color fgColor: root.bar ? root.bar.barForeground : Color.bar.text
@@ -36,6 +37,27 @@ BarWidget {
     var values = (Hyprland.workspaces && Hyprland.workspaces.values) ? Hyprland.workspaces.values : []
     var focusedWs = Hyprland.focusedWorkspace
     var focusedId = (focusedWs && focusedWs.id > 0) ? focusedWs.id : 1
+
+    // Hide-empty mode: only occupied workspaces are shown. The focused workspace
+    // stays visible even when empty so the current position is always indicated.
+    if (root.setting("hideEmptyWorkspaces", false)) {
+      var visible = []
+      var seen = {}
+      if (focusedWs && focusedWs.id > 0 && focusedWs.id <= 10) {
+        visible.push(focusedWs.id)
+        seen[focusedWs.id] = true
+      }
+      for (var i = 0; i < values.length; i++) {
+        var ws = values[i]
+        if (ws && ws.id > 0 && ws.id <= 10 && !seen[ws.id] &&
+            ws.toplevels && ws.toplevels.values && ws.toplevels.values.length > 0) {
+          visible.push(ws.id)
+        }
+      }
+      visible.sort(function(a, b) { return a - b })
+      if (visible.length === 0) visible.push(focusedId)
+      return visible
+    }
 
     var dynamicMode = root.setting("dynamic", true)
     var minWs = Math.max(1, root.setting("minWorkspaces", 2))
