@@ -15,6 +15,22 @@ BarWidget {
   readonly property bool showNumbers: root.setting("showNumbers", false)
   readonly property bool hideEmpty: root.setting("hideEmptyWorkspaces", false)
 
+  property int windowUpdateTrigger: 0
+
+  Connections {
+    target: Hyprland
+    function onRawEvent(event) {
+      if (!event) return
+      var n = event.name
+      if (n === "openwindow" || n === "closewindow" || n === "movewindow" || n === "movewindowv2" ||
+          n === "createworkspace" || n === "createworkspacev2" || n === "destroyworkspace" || n === "destroyworkspacev2" ||
+          n === "moveworkspace" || n === "moveworkspacev2" || n === "renameworkspace" || n === "urgent" ||
+          n === "focusedmon" || n === "focusedmonv2" || n === "workspace" || n === "workspacev2") {
+        root.windowUpdateTrigger++
+      }
+    }
+  }
+
   // Color tokens — seamlessly matches the active theme
   readonly property color fgColor: root.bar ? root.bar.barForeground : Color.bar.text
   readonly property color themeAccent: Color.accent
@@ -34,26 +50,43 @@ BarWidget {
 
   // Workspaces list calculation (GNOME / Ubuntu dynamic model)
   readonly property var activeWorkspaces: {
+    var _trigger = root.windowUpdateTrigger
     var values = (Hyprland.workspaces && Hyprland.workspaces.values) ? Hyprland.workspaces.values : []
     var focusedWs = Hyprland.focusedWorkspace
     var focusedId = (focusedWs && focusedWs.id > 0) ? focusedWs.id : 1
 
     // Hide-empty mode: only occupied workspaces are shown. The focused workspace
-    // stays visible even when empty so the current position is always indicated.
-    if (root.setting("hideEmptyWorkspaces", false)) {
+    // and any active workspace across connected monitors stay visible so the current
+    // monitor positions are always indicated.
+    if (root.hideEmpty) {
       var visible = []
       var seen = {}
+
       if (focusedWs && focusedWs.id > 0 && focusedWs.id <= 10) {
         visible.push(focusedWs.id)
         seen[focusedWs.id] = true
       }
+
+      var monitors = (Hyprland.monitors && Hyprland.monitors.values) ? Hyprland.monitors.values : []
+      for (var m = 0; m < monitors.length; m++) {
+        var mon = monitors[m]
+        if (mon && mon.activeWorkspace && mon.activeWorkspace.id > 0 && mon.activeWorkspace.id <= 10) {
+          if (!seen[mon.activeWorkspace.id]) {
+            visible.push(mon.activeWorkspace.id)
+            seen[mon.activeWorkspace.id] = true
+          }
+        }
+      }
+
       for (var i = 0; i < values.length; i++) {
         var ws = values[i]
         if (ws && ws.id > 0 && ws.id <= 10 && !seen[ws.id] &&
             ws.toplevels && ws.toplevels.values && ws.toplevels.values.length > 0) {
           visible.push(ws.id)
+          seen[ws.id] = true
         }
       }
+
       visible.sort(function(a, b) { return a - b })
       if (visible.length === 0) visible.push(focusedId)
       return visible
@@ -196,7 +229,10 @@ BarWidget {
 
           readonly property int wsId: modelData
           readonly property var wsObj: root.workspaceById(wsId)
-          readonly property bool isOccupied: wsObj !== null && wsObj.toplevels && wsObj.toplevels.values && wsObj.toplevels.values.length > 0
+          readonly property bool isOccupied: {
+            var _t = root.windowUpdateTrigger
+            return wsObj !== null && wsObj.toplevels && wsObj.toplevels.values && wsObj.toplevels.values.length > 0
+          }
           readonly property bool isFocused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === wsId
           readonly property bool isHovered: delegateMouseAreaH.containsMouse
 
@@ -288,7 +324,10 @@ BarWidget {
 
           readonly property int wsId: modelData
           readonly property var wsObj: root.workspaceById(wsId)
-          readonly property bool isOccupied: wsObj !== null && wsObj.toplevels && wsObj.toplevels.values && wsObj.toplevels.values.length > 0
+          readonly property bool isOccupied: {
+            var _t = root.windowUpdateTrigger
+            return wsObj !== null && wsObj.toplevels && wsObj.toplevels.values && wsObj.toplevels.values.length > 0
+          }
           readonly property bool isFocused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === wsId
           readonly property bool isHovered: delegateMouseAreaV.containsMouse
 
